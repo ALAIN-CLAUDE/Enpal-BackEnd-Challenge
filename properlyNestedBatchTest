@@ -1,0 +1,51 @@
+ @isTest //100% pass
+public class properlyNestedBatchTest {
+
+    static testMethod void testPropNested(){
+        Widget__c W = new Widget__c();
+   	    W.Status__c = 'New';
+        W.Value__c  = 'properly nested';
+       
+        insert W;
+        
+        Test.startTest();
+         properlyNestedBatch  pn= new  properlyNestedBatch();
+         Id jobid= Database.executeBatch(pn,1);
+        Test.stopTest();
+        
+        Widget__c Widgets = [select id,Is_Properly_Nested__c,Status__c from Widget__c where id=:W.Id];
+        system.assertEquals(true, Widgets.Is_Properly_Nested__c);
+    }
+    
+     static testMethod void testPropNested2(){
+         Profile pf = [SELECT Id FROM Profile WHERE Name='System Administrator']; 
+         
+         User uza = new User(Alias = 'Cyclone', Email='CycloneAdmin@g.com', EmailEncodingKey='UTF-8',
+                             LastName='Testing', LanguageLocaleKey='en_US', UserName='Cyclone1Admin@g.com',
+                             LocaleSidKey='en_US', TimeZoneSidKey='America/Los_Angeles',ProfileId = pf.Id);
+         
+		insert uza ;
+       
+         
+         
+        Widget__c W = new Widget__c();
+   	    W.Status__c = 'New';
+        W.Value__c  = 'partially nested';
+       
+         System.runAs(uza) {
+              W.ownerId = uza.id;
+              insert W;
+         }  
+               
+        Test.startTest();
+         properlyNestedBatch  pn= new  properlyNestedBatch();
+         Id jobid= Database.executeBatch(pn,1);
+        Test.stopTest();
+        
+        Widget__c Widgets = [select id,Is_Properly_Nested__c,Status__c from Widget__c where id=:W.Id];
+        system.assertEquals(false, Widgets.Is_Properly_Nested__c);
+    }
+
+    
+    
+}
