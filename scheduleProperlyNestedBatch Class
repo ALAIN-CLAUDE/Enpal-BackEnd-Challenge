@@ -1,0 +1,6 @@
+global class scheduleProperlyNestedBatch implements Schedulable{
+   global void execute(SchedulableContext sc) {
+        properlyNestedBatch pn = new properlyNestedBatch();
+        database.executebatch(pn,1);  
+    }
+}
