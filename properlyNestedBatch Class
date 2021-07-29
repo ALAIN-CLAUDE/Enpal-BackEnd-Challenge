@@ -1,0 +1,46 @@
+global class  properlyNestedBatch implements Database.Batchable<sObject>{
+      List <Widget__c> toUpdate = new List <Widget__c> ();
+   
+
+    global Database.QueryLocator start(Database.BatchableContext BC){
+        
+       String query = 'select id,name,ownerId,Owner.Email,Is_Properly_Nested__c ,Status__c ,Value__c from Widget__c';
+        return Database.getQueryLocator(query);
+    }
+
+    global void execute(Database.BatchableContext BC, List<Widget__c> scope){
+        for ( Widget__c W : scope)
+        {
+            if(W.Status__c == 'New'){
+                W.Status__c = 'Old';
+                if(W.Value__c == 'properly nested'){
+                     W.Is_Properly_Nested__c = true;                  
+                     toUpdate.add(W); 
+                }
+                else{
+                    //Note: i can create a mass email send with template to forward to record owner
+                     Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                   	    String[] toAddresses = new String[] {W.Owner.Email};
+                        mail.setToAddresses(toAddresses);
+                    	mail.setSubject('Records not properly nested ' );
+        				mail.setPlainTextBody('Record Name :  ' + W.name +   ' Record Link : ' + 'https://creative-goat-9jgax0-dev-ed.lightning.force.com/'+W.id);
+        				Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+                          
+                }
+            }
+        
+        }
+        update toUpdate;
+    }  
+
+    global void finish(Database.BatchableContext BC){
+       
+         AsyncApexJob a = [Select Id, Status,ExtendedStatus,NumberOfErrors, JobItemsProcessed,TotalJobItems, CreatedBy.Email from AsyncApexJob where Id =:BC.getJobId()];
+       		 system.debug('Status==> ' + a.Status);
+       		 system.debug('NumberOfErrors==> ' + a.NumberOfErrors);
+        	 system.debug('TotalJobItems==> ' + a.TotalJobItems);
+       		 system.debug('ID==> ' + a.Id);
+        
+        
+    }
+}
