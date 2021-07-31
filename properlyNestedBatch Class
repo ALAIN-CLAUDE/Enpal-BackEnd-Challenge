@@ -23,8 +23,8 @@ global class  properlyNestedBatch implements Database.Batchable<sObject>{
                    	    String[] toAddresses = new String[] {W.Owner.Email};
                         mail.setToAddresses(toAddresses);
                     	mail.setSubject('Records not properly nested ' );
-        				mail.setPlainTextBody('Record Name :  ' + W.name +   ' Record Link : ' + 'https://creative-goat-9jgax0-dev-ed.lightning.force.com/'+W.id);
-        				Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        			mail.setPlainTextBody('Record Name :  ' + W.name +   ' Record Link : ' + 'https://creative-goat-9jgax0-dev-ed.lightning.force.com/'+W.id);
+        			Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
                           
                 }
             }
