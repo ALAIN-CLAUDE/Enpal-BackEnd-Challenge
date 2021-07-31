@@ -12,7 +12,7 @@ global class  properlyNestedBatch implements Database.Batchable<sObject>{
         for ( Widget__c W : scope)
         {
             if(W.Status__c == 'New'){
-                W.Status__c = 'Old';
+                W.Status__c = 'Processed';
                 if(W.Value__c == 'properly nested'){
                      W.Is_Properly_Nested__c = true;                  
                      toUpdate.add(W); 
